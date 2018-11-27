@@ -1,5 +1,10 @@
 from numpy import genfromtxt
 
-my_data = genfromtxt('/home/jake/Documents/Project/data/InsurancePrices/testData.csv', delimiter = ',')
+def extractFromCSV(fileName):
+	file_data = genfromtxt(fileName, delimiter = '|', dtype=None, encoding=None) #Specify no encoding in order to stop warnings (leaving blank is deprieciated)
+	return file_data
 
-print(my_data)
+
+print(extractFromCSV('test.csv'))
+
+
