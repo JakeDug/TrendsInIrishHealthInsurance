@@ -2,8 +2,14 @@ from numpy import genfromtxt
 import plotly
 import plotly.plotly as py
 import plotly.graph_objs as go
+from os import listdir
+from os.path import isfile, join
 
 plotly.tools.set_credentials_file(username='JakeDug', api_key='EOBghCU6WNJz4NJhrTTZ')
+
+def readInFiles(filePath):
+	fileList = [f for f in listdir(filePath) if isfile(join(filePath, f))]
+	return fileList
 
 def extractFromCSV(fileName):
 	file_data = genfromtxt(fileName, delimiter = '|', dtype=None, encoding=None) #Specify no encoding in order to stop warnings (leaving blank is deprieciated)
@@ -29,11 +35,6 @@ def createPlotGroup(fileList):
 		
 		trace.append(fileName)
 		
-	py.plot(trace, filename='line-mode')
+	py.plot(trace, filename='numpy-array-ex1')
 
-files = ['VhiJan2018.csv', 'VhiJuly2018.csv']
-
-createPlotGroup(files)
-		
-	
 
