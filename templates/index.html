@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block the_block %}
+<h1>HIPAS</h1>
+	<graph>
+	<iframe src="https://plot.ly/~JakeDug/0/" style="height:400px;width:800px"></iframe>
+	</graph>
+	
+	
+	<form method='post' action='playgame'>
+	<input type="checkbox" name="vhi" value="vhi">Vhi
+	<br>
+	<input type="checkbox" name="laya" value="laya">Laya
+	<br>
+	<input type="checkbox" name="irishLife" value="irishLife">Irish Life Health
+	<br>
+	<select name="AgeGroup">
+		<option value="adult">adult</option>
+		<option value="young_adult_aged_25">adult 25</option>
+		<option value="young_adult_aged_24">adult 24</option>
+		<option value="young_adult_aged_23">adult 23</option>
+		<option value="young_adult_aged_22">adult 22</option>
+		<option value="young_adult_aged_21">adult 21</option>
+		<option value="young_adult_aged_20">adult 20</option>
+		<option value="young_adult_aged_19">adult 19</option>
+		<option value="young_adult_aged_18">adult 18</option>
+		<option value="child_1">child 1</option>
+		<option value="child_1">child 2</option>
+		<option value="child_1">child 3</option>
+		<option value="child_1">child 4</option>
+		<option value="newborn">newborn</option>
+	</select>
+	<br>
+	<input type="date" name="Start Date" id="startDate">
+	<input type="date" name="End Date" id="endDate">
+	<input type='submit' value='Generate Graph'>
+	</form>
+{% endblock %}

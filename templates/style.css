@@ -1,0 +1,12 @@
+body{
+	background-color: #e0e5da;
+	font-family: Verdana, Georgia, monospace;
+}
+
+graph{
+	border: solid;
+	border-color: #f1f2f0
+}
+h1{
+	background-color: #A52A2A;
+}
