@@ -1,8 +1,14 @@
 from flask import Flask, render_template, request, session, flash
-from graph import createPlotGraph
+from graph import createGraphFromSqlList
 import sys
 from flask_sqlalchemy import SQLAlchemy
 
+#Adds row from sql obj to python dict src: https://stackoverflow.com/questions/1024847/add-new-keys-to-a-dictionary
+def row2dict(row):
+	d = {}
+	for column in row.__table__.columns:
+		d[column.name] = str(getattr(row, column.name))
+	return d
 
 app = Flask(__name__)
 
@@ -25,8 +31,9 @@ db = SQLAlchemy(app)
 class InsuranceData(db.Model):
 
 	__tablename__ = "insuranceData"
+	company = db.Column(db.String(15))
 	plan_name = db.Column(db.String(40), primary_key=True)
-	adult = (db.Float)
+	adult = db.Column(db.Float)
 	young_adult_age_25 = db.Column(db.Float)
 	young_adult_age_24 = db.Column(db.Float)
 	young_adult_age_23 = db.Column(db.Float)
@@ -47,9 +54,22 @@ class InsuranceData(db.Model):
 
 @app.route('/', methods=["GET", "POST"])
 def index():
-	return render_template('index.html', the_title='HIPAS', insuranceData = InsuranceData.query.all())
+	print ("##########################")
+	if request.method == "POST":
+		query_data = []
+		attempted_age = request.form['AgeGroup']
+		query = InsuranceData.query.filter_by(company = "Vhi").all()
+		for row in range(0, len(query)):
+			query_data.append(row2dict(query[row]))
+		
+		createGraphFromSqlList(query_data)
+		
+		print(attempted_age)
+	print("=========================")
+
+	return render_template('index.html', the_title='HIPAS')
 
 if __name__ == '__main__':
-    app.secret_key = 'thebiglebowski;'
-    app.run(debug=True)
+	app.secret_key = 'thebiglebowski;'
+	app.run(debug=True)
 
