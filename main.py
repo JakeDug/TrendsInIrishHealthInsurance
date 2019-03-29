@@ -57,6 +57,7 @@ def index():
 	print ("##########################")
 	if request.method == "POST":
 		query_data = []
+<<<<<<< HEAD
 		attempted_age = request.form['AgeGroup']
 		query = InsuranceData.query.filter_by(company = "Vhi").all()
 		for row in range(0, len(query)):
@@ -65,6 +66,18 @@ def index():
 		createGraphFromSqlList(query_data)
 		
 		print(attempted_age)
+=======
+		attempted_plan = request.form.getlist('PlanName')
+		for plan in attempted_plan:
+			query = InsuranceData.query.filter_by(plan_name = plan).all()
+			for row in range(0, len(query)):
+				query_data.append(row2dict(query[row]))
+
+		createGraphFromSqlList(query_data)
+		print(query_data)
+		print(attempted_plan)
+
+>>>>>>> d81fa19074cf6a68d2cd3ff2fe8d546b7846b909
 	print("=========================")
 
 	return render_template('index.html', the_title='HIPAS')
