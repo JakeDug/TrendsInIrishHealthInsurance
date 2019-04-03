@@ -39,7 +39,7 @@ def createGraphFromSqlList(queryList):
 		query_data = queryList[row]
 		y = [query_data["adult"] ,query_data["young_adult_age_25"], query_data["young_adult_age_24"], query_data["young_adult_age_23"], query_data["young_adult_age_22"], query_data["young_adult_age_21"], query_data["young_adult_age_20"], query_data["young_adult_age_19"], query_data["young_adult_age_18"], query_data["child_one"], query_data["child_two"], query_data["child_three"], query_data["child_four"], query_data["newborn"]]
 		
-		plan_name = go.Scatter(x=x,y=y, name=query_data["plan_name"])
+		plan_name = go.Scatter(x=x,y=y, name=query_data["plan_name"] + ' ~ ' + query_data["date"])
 		
 		trace.append(plan_name)
 		
@@ -59,5 +59,19 @@ def createPlotGroup(fileList):
 		trace.append(fileName)
 
 	py.plot(trace, filename='numpy-array-ex1')
+	
+	
+def createPredictionGraph(priceList, dateList):
+	y = dateList
+	x = priceList
+	
+	trace = go.Scatter(
+	x = priceList,
+	y = dateList,
+	mode = 'markers'
+	)
+	
+	
+	py.plot([trace], filename='pred-graph')
 
 

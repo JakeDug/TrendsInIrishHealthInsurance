@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  linearRegression.py
+#  svm.py
 #  
 #  Copyright 2019 Jake Duggan <hipas@gmail.com>
 #  
@@ -21,54 +21,60 @@
 #  MA 02110-1301, USA.
 #  
 #  
-from sklearn import linear_model
+
+from linearRegression import readInList
+from sklearn.svm import SVR
 import datetime
-from graph import createPredictionGraph
+import numpy as np
+from sklearn.ensemble import RandomForestRegressor
 
-def readInList(ListOfDicts, ageGroup):
-	price = []
-	date = []
-	data = dict()
-	for row in range(0,len(ListOfDicts)):
-		query_data = ListOfDicts[row]
-		y = [query_data[ageGroup] ]
-		price.append(y)
-
-	return price
-
-def linearReg(ListOfDicts, ageGroup, dateToPredict):
+def svm(ListOfDicts, ageGroup, dateToPredict):
 	price = readInList(ListOfDicts, ageGroup)
 	dateStr = readInList(ListOfDicts, "date")
 	dateObj = []
-
 
 
 	for i in dateStr:
 		x = datetime.datetime.strptime(i[0], '%Y-%m-%d')
 		x = [x.toordinal()]
 		dateObj.append(x)
-
-
-	reg = linear_model.LinearRegression()
-	reg.fit(dateObj, price)
-	m=reg.coef_[0]
-	b=reg.intercept_
-	print("slope=", m, "intercept=", b)
-
-
+	
+	price = np.array(price)
+	dateObj = np.array(dateObj)
+	
+	svr = SVR(C=1.0, gamma=1.0)
+	svr.fit(dateObj, price)
+	
 	datePred = datetime.datetime.strptime(dateToPredict, '%Y-%m-%d')
 	datePred = [datePred.toordinal()]
+	
+	y_pred = svr.predict([datePred])
+	
+	print("SVM++++++++++++++")
+	print(y_pred)
+	return(y_pred)
 
-	test = reg.predict(X=[datePred])
+def randomForest(ListOfDicts, ageGroup, dateToPredict):
 	
-	price.append(test[0][0])
-	dateToPredict = [dateToPredict]
-	dateStr.append(dateToPredict)
-	print(">>>>>>>>>>>>>>>")
-	print(dateStr)
-	print(price)
-	print("<<<<<<<<<<<<<<<")
+	price = readInList(ListOfDicts, ageGroup)
+	dateStr = readInList(ListOfDicts, "date")
+	dateObj = []
+
+
+	for i in dateStr:
+		x = datetime.datetime.strptime(i[0], '%Y-%m-%d')
+		x = [x.toordinal()]
+		dateObj.append(x)
 	
-	createPredictionGraph(price, dateStr)
-	print(test[0])
-	return(test[0][0])
+	price = np.array(price)
+	dateObj = np.array(dateObj)
+	
+	datePred = datetime.datetime.strptime(dateToPredict, '%Y-%m-%d')
+	datePred = [datePred.toordinal()]
+	
+	clf_rf = RandomForestRegressor(n_estimators=50)
+	clf_rf.fit(dateObj, price)
+	y_pred_rf = clf_rf.predict([datePred])
+	
+	print(y_pred_rf)
+	return(y_pred_rf)

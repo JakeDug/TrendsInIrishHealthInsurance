@@ -1,7 +1,10 @@
 from flask import Flask, render_template, request, session, flash
 from graph import createGraphFromSqlList
+from timeSeries import convertToDataFrame
 import sys
 from flask_sqlalchemy import SQLAlchemy
+from linearRegression import linearReg
+from svm import svm
 
 #Adds row from sql obj to python dict src: https://stackoverflow.com/questions/1024847/add-new-keys-to-a-dictionary
 def row2dict(row):
@@ -11,6 +14,8 @@ def row2dict(row):
 	return d
 
 app = Flask(__name__)
+app.secret_key = "secretKey"
+
 
 
 #Database Connection
@@ -57,32 +62,68 @@ def index():
 	print ("##########################")
 	if request.method == "POST":
 		query_data = []
-<<<<<<< HEAD
-		attempted_age = request.form['AgeGroup']
-		query = InsuranceData.query.filter_by(company = "Vhi").all()
-		for row in range(0, len(query)):
-			query_data.append(row2dict(query[row]))
-		
-		createGraphFromSqlList(query_data)
-		
-		print(attempted_age)
-=======
-		attempted_plan = request.form.getlist('PlanName')
-		for plan in attempted_plan:
-			query = InsuranceData.query.filter_by(plan_name = plan).all()
+		error = ""
+		attempted_plan_vhi = request.form.getlist('PlanName1')
+		attempted_plan_ilh = request.form.getlist('PlanName2')
+		attempted_plan_laya = request.form.getlist('PlanName3')
+		attempted_startDate = request.form.get('startDate')
+		attempted_endDate = request.form.get('endDate')
+
+		for plan in attempted_plan_vhi:
+
+			query = InsuranceData.query.filter_by(plan_name = plan).filter(InsuranceData.date.between(attempted_startDate, attempted_endDate)).all()
+
 			for row in range(0, len(query)):
 				query_data.append(row2dict(query[row]))
 
-		createGraphFromSqlList(query_data)
-		print(query_data)
-		print(attempted_plan)
+		for plan in attempted_plan_ilh:
 
->>>>>>> d81fa19074cf6a68d2cd3ff2fe8d546b7846b909
+			query = InsuranceData.query.filter_by(plan_name = plan).filter(InsuranceData.date.between(attempted_startDate, attempted_endDate)).all()
+
+			for row in range(0, len(query)):
+				query_data.append(row2dict(query[row]))
+
+		for plan in attempted_plan_laya:
+
+			query = InsuranceData.query.filter_by(plan_name = plan).filter(InsuranceData.date.between(attempted_startDate, attempted_endDate)).all()
+
+			for row in range(0, len(query)):
+				query_data.append(row2dict(query[row]))
+
+
+		if len(query_data) > 0:
+			#print(">>>>>>>>>>>>>>>>>")
+			#print(convertToDataFrame(query_data))
+			createGraphFromSqlList(query_data)
+
+		else:
+			flash("Error - Query returned no results for the plan(s) date combination")
+
+
 	print("=========================")
 
 	return render_template('index.html', the_title='HIPAS')
 
+@app.route('/predict', methods=["GET", "POST"])
+def predict():
+	if request.method == "POST":
+		query_data = []
+		attempted_age = request.form.get('age')
+		attempted_plan = request.form.get('PlanName')
+		attempted_date = request.form.get('predDate')
+
+		query = query = InsuranceData.query.filter_by(plan_name = attempted_plan).all()
+
+		for row in range(0, len(query)):
+			query_data.append(row2dict(query[row]))
+
+		if len(query_data) > 0:
+			flash(round(linearReg(query_data, attempted_age, attempted_date), 2))
+			svm(query_data, attempted_age, attempted_date)
+
+	return render_template('predict.html', the_title='HIPAS')
+
 if __name__ == '__main__':
-	app.secret_key = 'thebiglebowski;'
+	app.secret_key = 'secretKey'
 	app.run(debug=True)
 

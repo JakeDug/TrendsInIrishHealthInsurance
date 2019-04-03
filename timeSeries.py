@@ -22,37 +22,30 @@
 #  
 #  
 
+import datetime
+import time
 
-import pandas as pd
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
-from datetime import datetime
+import pandas as pd
+from linearRegression import readInList
 
-colNames = ["plan_name", "company","adult" ,"young_adult_age_25", "young_adult_age_24", "young_adult_age_23", "young_adult_age_22", "young_adult_age_21", "young_adult_age_20", "young_adult_age_19", "young_adult_age_18", "child_one", "child_two", "child_three", "child_four", "newborn","date"]
+price = readInList(ListOfDicts, ageGroup)
+dateStr = readInList(ListOfDicts, "date")
+dateObj = []
+
+	for i in dateStr:
+		x = datetime.datetime.strptime(i[0], '%Y-%m-%d')
+		dateObj.append(x)
+
+data = pd.DataFrame({'date' : dateObj, 'price' : price})
+
+y = data.price
+y.index.name = 'time'
+y.resample('Q', convention='start').asfreq()
 
 
-def convertToDataFrame(ListOfDicts):
-	index = ListOfDicts[0]
-	data = [index["plan_name"],index["company"] ,index["adult"] ,index["young_adult_age_25"], index["young_adult_age_24"], index["young_adult_age_23"], index["young_adult_age_22"], index["young_adult_age_21"], index["young_adult_age_20"], index["young_adult_age_19"], index["young_adult_age_18"], index["child_one"], index["child_two"], index["child_three"], index["child_four"], index["newborn"], index["date"]]
 
-	priceDF = pd.DataFrame([data], columns=colNames)
-	for selectedDict in range(0,len(ListOfDicts)):
-		dictData = ListOfDicts[slectedDict]
-		pdConvert = pd.DataFrame.from_dict(dictData)
-		priceDF.append(pdConvert)
-		
-	return priceDF
-
-data = pd.read_csv('insuranceData.csv')
-print(data.head())
-print(data.dtypes)
-
-dateparse = lambda dates: pd.datetime.strptime(dates, '%Y-%m-%d')
-data = pd.read_csv('insuranceData.csv', parse_dates=['date'], index_col='date',date_parser=dateparse)
-
-print(data.head())
-
-print(data.index)
-
-ts = data["adult"]
 
 
