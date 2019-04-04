@@ -65,6 +65,26 @@ def createPredictionGraph(priceList, dateList):
 	y = dateList
 	x = priceList
 	
+	layout = go.Layout(
+		title='',
+		xaxis=dict(
+			title='Price',
+			titlefont=dict(
+				family='Courier New, monospace',
+				size=18,
+				color='#7f7f7f'
+			)
+		),
+		yaxis=dict(
+			title='Date',
+			titlefont=dict(
+				family='Courier New, monospace',
+				size=18,
+				color='#7f7f7f'
+			)
+		)
+	)
+	
 	trace = go.Scatter(
 	x = priceList,
 	y = dateList,
@@ -72,6 +92,8 @@ def createPredictionGraph(priceList, dateList):
 	)
 	
 	
-	py.plot([trace], filename='pred-graph')
+	fig = go.Figure(data=[trace], layout=layout)
+	
+	py.plot(fig, filename='pred-graph')
 
 
