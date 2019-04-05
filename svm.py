@@ -27,6 +27,8 @@ from sklearn.svm import SVR
 import datetime
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import train_test_split
 
 def svm(ListOfDicts, ageGroup, dateToPredict):
 	price = readInList(ListOfDicts, ageGroup)
@@ -48,11 +50,40 @@ def svm(ListOfDicts, ageGroup, dateToPredict):
 	datePred = datetime.datetime.strptime(dateToPredict, '%Y-%m-%d')
 	datePred = [datePred.toordinal()]
 	
-	y_pred = svr.predict([datePred])
+	pred = svr.predict([datePred])
 	
-	print("SVM++++++++++++++")
-	print(y_pred)
-	return(y_pred)
+	X_train, X_test, y_train, y_test = train_test_split(
+	dateObj, price, train_size = 0.70
+	)
+	#predict values we already know
+	y_pred = []
+
+	for i in X_test:
+		x = svr.predict([i])
+		y_pred.append(x)
+
+
+	y_pred_formatted = []
+	y_test_formatted = []
+	
+	for i in y_pred:
+		i[0] = round(i[0], 2)
+		y_pred_formatted.append(i[0])
+		
+	
+	y_test = y_test.astype(np.float)
+	for i in y_test:
+		y_test_formatted.append(i[0])
+	
+	print(type(y_test_formatted[0]))
+	
+	error = mean_absolute_error(y_test_formatted, y_pred_formatted)
+	error = round(error, 2)
+	pred[0] = round(pred[0], 2)
+	
+	result = "SVR = " + str(pred[0]) + " with Mean Absolute Error of " + str(error)
+	
+	return(result)
 
 def randomForest(ListOfDicts, ageGroup, dateToPredict):
 	
@@ -74,7 +105,37 @@ def randomForest(ListOfDicts, ageGroup, dateToPredict):
 	
 	clf_rf = RandomForestRegressor(n_estimators=50)
 	clf_rf.fit(dateObj, price)
-	y_pred_rf = clf_rf.predict([datePred])
+	pred = clf_rf.predict([datePred])
 	
-	print(y_pred_rf)
-	return(y_pred_rf)
+	X_train, X_test, y_train, y_test = train_test_split(
+	dateObj, price, train_size = 0.70
+	)
+	#predict values we already know
+	y_pred = []
+
+	for i in X_test:
+		x = clf_rf.predict([i])
+		y_pred.append(x)
+
+
+	y_pred_formatted = []
+	y_test_formatted = []
+	
+	for i in y_pred:
+		i[0] = round(i[0], 2)
+		y_pred_formatted.append(i[0])
+		
+	
+	y_test = y_test.astype(np.float)
+	for i in y_test:
+		y_test_formatted.append(i[0])
+	
+	print(type(y_test_formatted[0]))
+	
+	error = mean_absolute_error(y_test_formatted, y_pred_formatted)
+	error = round(error, 2)
+	
+	pred[0] = round(pred[0], 2)
+	
+	result = "Random Forest = " + str(pred[0]) + " with Mean Absolute Error of " + str(error)
+	return(result)
