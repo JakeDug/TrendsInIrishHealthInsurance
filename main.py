@@ -4,7 +4,9 @@ from timeSeries import convertToDataFrame
 import sys
 from flask_sqlalchemy import SQLAlchemy
 from linearRegression import linearReg
-from svm import svm
+from machineLearning import svm
+from machineLearning import randomForest
+from machineLearning import gradientBoostingRegressor
 
 #Adds row from sql obj to python dict src: https://stackoverflow.com/questions/1024847/add-new-keys-to-a-dictionary
 def row2dict(row):
@@ -111,6 +113,7 @@ def predict():
 		attempted_age = request.form.get('age')
 		attempted_plan = request.form.get('PlanName')
 		attempted_date = request.form.get('predDate')
+		attempted_ml = request.form.get('machineLearning')
 
 		query = query = InsuranceData.query.filter_by(plan_name = attempted_plan).all()
 
@@ -118,8 +121,14 @@ def predict():
 			query_data.append(row2dict(query[row]))
 
 		if len(query_data) > 0:
-			flash(round(linearReg(query_data, attempted_age, attempted_date), 2))
-			svm(query_data, attempted_age, attempted_date)
+			if attempted_ml == 'linReg':
+				flash(linearReg(query_data, attempted_age, attempted_date))
+			if attempted_ml == 'svr':
+				flash(svm(query_data, attempted_age, attempted_date))
+			if attempted_ml == 'randFor':
+				flash(randomForest(query_data, attempted_age, attempted_date))
+			if attempted_ml == 'gradBoost':
+			    flash(gradientBoostingRegressor(query_data, attempted_age, attempted_date))
 
 	return render_template('predict.html', the_title='HIPAS')
 
