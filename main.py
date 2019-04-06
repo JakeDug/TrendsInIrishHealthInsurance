@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, session, flash
 from graph import createGraphFromSqlList
-from timeSeries import convertToDataFrame
 import sys
 from flask_sqlalchemy import SQLAlchemy
 from linearRegression import linearReg
@@ -10,6 +9,20 @@ from machineLearning import gradientBoostingRegressor
 
 #Adds row from sql obj to python dict src: https://stackoverflow.com/questions/1024847/add-new-keys-to-a-dictionary
 def row2dict(row):
+	""" 
+	Adds a row from an SQL obj to python dict 
+	
+	Parameters
+	----------
+	
+	row : sql alchemy obj
+		An sql alchemey obj containing data for one row in the database
+		
+	Returns
+	-------
+	**retruns** : dict
+		returns the sql obj as a python dict
+	"""
 	d = {}
 	for column in row.__table__.columns:
 		d[column.name] = str(getattr(row, column.name))
@@ -36,7 +49,16 @@ db = SQLAlchemy(app)
 
 #define InsuranceData table + data
 class InsuranceData(db.Model):
-
+	
+	""" 
+	This class maps all columns from the given insuranceData table to variables of the same type. 
+	
+	Parameters
+	----------
+	
+	db.Model : SQLAlchemy DB model
+	
+	"""
 	__tablename__ = "insuranceData"
 	company = db.Column(db.String(15))
 	plan_name = db.Column(db.String(40), primary_key=True)
@@ -61,6 +83,20 @@ class InsuranceData(db.Model):
 
 @app.route('/', methods=["GET", "POST"])
 def index():
+	""" 
+	Desc
+		Index page method. Routes the application to / on a get request. On a post request this method gets the plan name(s), 
+		startDate and endDate, querys the data base for those parameters. If these parameters are found a graph is generated 
+		using *createGraphFromSqlList* and the page is reloaded.
+	
+	Parameters
+	----------
+		
+	Returns
+	-------
+	**retruns** : render_template
+		renders the index(/) page
+	"""
 	print ("##########################")
 	if request.method == "POST":
 		query_data = []
@@ -108,6 +144,20 @@ def index():
 
 @app.route('/predict', methods=["GET", "POST"])
 def predict():
+	""" 
+	Desc
+		Predict page method. On get routes the application to /predict. On POST it gets age, plan, date and ml. It then querys the DB for
+		rows matching these parameters. On finding row(s) matching these parameters one of the methods from the machineLearning module is used
+		depending on the value of attempted_ml.
+	Parameters
+	----------
+	
+		
+	Returns
+	-------
+	**retruns** : render_template
+		renders the predict(/predict) page
+	"""
 	if request.method == "POST":
 		query_data = []
 		attempted_age = request.form.get('age')
@@ -135,4 +185,3 @@ def predict():
 if __name__ == '__main__':
 	app.secret_key = 'secretKey'
 	app.run(debug=True)
-
